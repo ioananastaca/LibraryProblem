@@ -32,32 +32,34 @@ static void AdaugaCarte(List<Carte> listaCarti)
     Console.WriteLine("Numar exemplare: ");
     int nrExemplare = int.Parse(Console.ReadLine());
 
-    var carte = listaCarti.FirstOrDefault(x => x.iSBN == ISBN); ;
-
-    if (carte != null)
+    if (nrExemplare > 0)
     {
-        if (nrExemplare == 0)
+        var carte = listaCarti.FirstOrDefault(x => x.iSBN == ISBN); ;
+
+        if (carte != null)
         {
-            Console.Write("Numarul de exemplare adaugat trebuie sa fie mai mare decat 0!");
+            carte.nrExemplare = carte.nrExemplare + nrExemplare;
         }
         else
         {
-            carte.nrExemplare = carte.nrExemplare + nrExemplare;
+            Console.WriteLine("Nume carte: ");
+            string numeCarte = Console.ReadLine().ToString();
+
+            Console.WriteLine("Pret carte: ");
+            double pretInchiriere = double.Parse(Console.ReadLine());
+
+            Carte carteNoua = new Carte(ISBN, numeCarte, pretInchiriere, nrExemplare);
+            listaCarti.Add(carteNoua);
+
+            Console.WriteLine("Ati adaugat o carte noua!");
         }
     }
     else
     {
-        Console.WriteLine("Nume carte: ");
-        string numeCarte = Console.ReadLine().ToString();
-
-        Console.WriteLine("Pret carte: ");
-        double pretInchiriere = double.Parse(Console.ReadLine());
-
-        Carte carteNoua = new Carte(ISBN, numeCarte, pretInchiriere, nrExemplare);
-        listaCarti.Add(carteNoua);
-
-        Console.WriteLine("Ati adaugat o carte noua!");
+        Console.WriteLine("Numarul de exemplare trebuie sa fie mai mare decat 0!");
     }
+
+   
 }
 
 //afisare lista carti total
@@ -137,42 +139,37 @@ void ReturnareCarte(List<Imprumut> listaImprumuturi, string nrTelefonCititor, st
 
     if (imprumut != null)
     {
-        try { 
-               var dataImprumut = imprumut.dataImprumut;
+         var dataImprumut = imprumut.dataImprumut;
 
-               Console.WriteLine("----Introduceti data restituirii----");
+         Console.WriteLine("----Introduceti data restituirii----");
 
-               Console.WriteLine("Ziua: [1-31]");
-               var zi = int.Parse(Console.ReadLine());
-               Console.WriteLine("Luna: [1-12]");
-               var luna = int.Parse(Console.ReadLine());
-               Console.WriteLine("An: [1 - x]");
-               var an = int.Parse(Console.ReadLine());
+         Console.WriteLine("Ziua: [1-31]");
+         var zi = int.Parse(Console.ReadLine());
+         Console.WriteLine("Luna: [1-12]");
+         var luna = int.Parse(Console.ReadLine());
+         Console.WriteLine("An: [1 - x]");
+         var an = int.Parse(Console.ReadLine());
 
-               var dataRestituire = Convert.ToDateTime(luna + "/" + zi + "/" + an);
+         var dataRestituire = Convert.ToDateTime(luna + "/" + zi + "/" + an);
 
-               var intervalImprumut = dataRestituire - dataImprumut;
+         var intervalImprumut = dataRestituire - dataImprumut;
 
-               if (intervalImprumut.Days <= 14)
-               {
-                   carteaImprumutata.nrExemplare++;
-                   Console.WriteLine("Multumim pentru respectarea conditiilor de imprumutare!");
-               }
-               else
-               {
-                   int numarZileContraCost = intervalImprumut.Days - 14;
-                   double pretInchiriere = (carteaImprumutata.pretInchiriere * 0.01) * numarZileContraCost;
+         if (intervalImprumut.Days <= 14)
+         {
+             carteaImprumutata.nrExemplare++;
+             Console.WriteLine("Multumim pentru respectarea conditiilor de imprumutare!");
+         }
+         else
+         {
+             int numarZileContraCost = intervalImprumut.Days - 14;
+             double pretInchiriere = (carteaImprumutata.pretInchiriere * 0.01) * numarZileContraCost;
 
-                   Console.WriteLine("Din cauza ca ati depasit zilele permise pentru impumutarea unei carti, " +
-                       "trebuie achitata suma de " + pretInchiriere + " lei.");
-               }
+             Console.WriteLine("Din cauza ca ati depasit zilele permise pentru impumutarea unei carti, " +
+                 "trebuie achitata suma de " + pretInchiriere + " lei.");
+         }
 
-               listaImprumuturi.Remove(imprumut);
-        }
-        catch(FormatException)
-        {
-            Console.WriteLine("Invalid data!");
-        }
+         listaImprumuturi.Remove(imprumut);
+        
     }
     else
     {
@@ -180,70 +177,80 @@ void ReturnareCarte(List<Imprumut> listaImprumuturi, string nrTelefonCititor, st
     }
 }
 
-// meniu principal
-bool ShowMenu()
+//meniu interactiv
+try
 {
-    Console.WriteLine("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-    Console.WriteLine("Alege o optiune:");
-    Console.WriteLine("1) Lista carti biblioteca");
-    Console.WriteLine("2) Lista imprumuturi");
-    Console.WriteLine("3) Afisare numar exemplare disponibile dintr-o carte");
-    Console.WriteLine("4) Imprumuta carte");
-    Console.WriteLine("5) Restituie carte");
-    Console.WriteLine("6) Adauga carte");
-    Console.WriteLine("7) Iesire");
-    Console.Write("\r\nSelecteaza optiunea: ");
-
-    switch (Console.ReadLine())
+    bool ShowMenu()
     {
-        case "1":
-            Console.WriteLine("\n---Lista carti biblioteca---\n ");
-            AfisareCarti(cartiBiblioteca);
-            return true;
-        case "2":
-            Console.WriteLine("\n---Lista imprumuturi---\n ");
-            AfisareListaImprumuturi(listaImprumuturi);
-            return true;
-        case "3":
-            Console.WriteLine("\n---Afisare numar exemplare disponibile carte---\n ");
-            Console.WriteLine("Introduceti ISBN carte: ");
-            string ISBNcarte = Console.ReadLine().ToString();
-            AfisareNumarExemplareDisponibile(cartiBiblioteca, ISBNcarte);
-            return true;
-        case "4":
-            Console.WriteLine("\n---Imprumuta carte---\n ");
-            Console.WriteLine("Introduceti ISBN carte: ");
-            string ISBN = Console.ReadLine().ToString();
-            Console.WriteLine("Introduceti numar telefon cititor: ");
-            string telefon = Console.ReadLine().ToString();
-            ImprumutaCarte(cartiBiblioteca, ISBN, listaImprumuturi, telefon);
-            return true;
-        case "5":
-            Console.WriteLine("\n---Restituie carte---\n ");
-            Console.WriteLine("Introduceti ISBN carte: ");
-            string iSBN = Console.ReadLine().ToString();
-            Console.WriteLine("Introduceti numar telefon cititor: ");
-            string nrtelefon = Console.ReadLine().ToString();
-            ReturnareCarte(listaImprumuturi, nrtelefon, iSBN, cartiBiblioteca);
-            return true;
-        case "6":
-            Console.WriteLine("\n---Adauga carte carte---\n ");
-            AdaugaCarte(cartiBiblioteca);
-            return true;
-        case "7":
-            return false;
+        Console.WriteLine("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+        Console.WriteLine("Alege o optiune:");
+        Console.WriteLine("1) Lista carti biblioteca");
+        Console.WriteLine("2) Lista imprumuturi");
+        Console.WriteLine("3) Afisare numar exemplare disponibile dintr-o carte");
+        Console.WriteLine("4) Imprumuta carte");
+        Console.WriteLine("5) Restituie carte");
+        Console.WriteLine("6) Adauga carte");
+        Console.WriteLine("7) Iesire");
+        Console.Write("\r\nSelecteaza optiunea: ");
 
-        default:
-            return true;
+        switch (Console.ReadLine())
+        {
+            case "1":
+                Console.WriteLine("\n---Lista carti biblioteca---\n ");
+                AfisareCarti(cartiBiblioteca);
+                return true;
+            case "2":
+                Console.WriteLine("\n---Lista imprumuturi---\n ");
+                AfisareListaImprumuturi(listaImprumuturi);
+                return true;
+            case "3":
+                Console.WriteLine("\n---Afisare numar exemplare disponibile carte---\n ");
+                Console.WriteLine("Introduceti ISBN carte: ");
+                string ISBNcarte = Console.ReadLine().ToString();
+                AfisareNumarExemplareDisponibile(cartiBiblioteca, ISBNcarte);
+                return true;
+            case "4":
+                Console.WriteLine("\n---Imprumuta carte---\n ");
+                Console.WriteLine("Introduceti ISBN carte: ");
+                string ISBN = Console.ReadLine().ToString();
+                Console.WriteLine("Introduceti numar telefon cititor: ");
+                string telefon = Console.ReadLine().ToString();
+                ImprumutaCarte(cartiBiblioteca, ISBN, listaImprumuturi, telefon);
+                return true;
+            case "5":
+                Console.WriteLine("\n---Restituie carte---\n ");
+                Console.WriteLine("Introduceti ISBN carte: ");
+                string iSBN = Console.ReadLine().ToString();
+                Console.WriteLine("Introduceti numar telefon cititor: ");
+                string nrtelefon = Console.ReadLine().ToString();
+                ReturnareCarte(listaImprumuturi, nrtelefon, iSBN, cartiBiblioteca);
+                return true;
+            case "6":
+                Console.WriteLine("\n---Adauga carte carte---\n ");
+                AdaugaCarte(cartiBiblioteca);
+                return true;
+            case "7":
+                return false;
+
+            default:
+                return true;
+        }
+        Console.Clear();
     }
-    Console.Clear();
+
+    //apelare meniu
+    bool meniu = true;
+    while (meniu)
+    {
+        meniu = ShowMenu();
+    }
+}
+catch (FormatException)
+{
+    Console.WriteLine("Atentie! Ati adaugat un tip de data invalid! Va rugam sa reluati procesul!");
 }
 
-//apelare meniu
-bool meniu = true;
-while (meniu)
-{
-    meniu = ShowMenu();
-}
+
+
 
 
