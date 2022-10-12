@@ -137,36 +137,42 @@ void ReturnareCarte(List<Imprumut> listaImprumuturi, string nrTelefonCititor, st
 
     if (imprumut != null)
     {
-        var dataImprumut = imprumut.dataImprumut;
+        try { 
+               var dataImprumut = imprumut.dataImprumut;
 
-        Console.WriteLine("----Introduceti data restituirii----");
+               Console.WriteLine("----Introduceti data restituirii----");
 
-        Console.WriteLine("Ziua: [1-31]");
-        var zi = int.Parse(Console.ReadLine());
-        Console.WriteLine("Luna: [1-12]");
-        var luna = int.Parse(Console.ReadLine());
-        Console.WriteLine("An: [1 - x]");
-        var an = int.Parse(Console.ReadLine());
+               Console.WriteLine("Ziua: [1-31]");
+               var zi = int.Parse(Console.ReadLine());
+               Console.WriteLine("Luna: [1-12]");
+               var luna = int.Parse(Console.ReadLine());
+               Console.WriteLine("An: [1 - x]");
+               var an = int.Parse(Console.ReadLine());
 
-        var dataRestituire = Convert.ToDateTime(luna + "/" + zi + "/" + an);
+               var dataRestituire = Convert.ToDateTime(luna + "/" + zi + "/" + an);
 
-        var intervalImprumut = dataRestituire - dataImprumut;
+               var intervalImprumut = dataRestituire - dataImprumut;
 
-        if (intervalImprumut.Days <= 14)
-        {
-            carteaImprumutata.nrExemplare++;
-            Console.WriteLine("Multumim pentru respectarea conditiilor de imprumutare!");
+               if (intervalImprumut.Days <= 14)
+               {
+                   carteaImprumutata.nrExemplare++;
+                   Console.WriteLine("Multumim pentru respectarea conditiilor de imprumutare!");
+               }
+               else
+               {
+                   int numarZileContraCost = intervalImprumut.Days - 14;
+                   double pretInchiriere = (carteaImprumutata.pretInchiriere * 0.01) * numarZileContraCost;
+
+                   Console.WriteLine("Din cauza ca ati depasit zilele permise pentru impumutarea unei carti, " +
+                       "trebuie achitata suma de " + pretInchiriere + " lei.");
+               }
+
+               listaImprumuturi.Remove(imprumut);
         }
-        else
+        catch(FormatException)
         {
-            int numarZileContraCost = intervalImprumut.Days - 14;
-            double pretInchiriere = (carteaImprumutata.pretInchiriere * 0.01) * numarZileContraCost;
-
-            Console.WriteLine("Din cauza ca ati depasit zilele permise pentru impumutarea unei carti, " +
-                "trebuie achitata suma de " + pretInchiriere + " lei.");
+            Console.WriteLine("Invalid data!");
         }
-
-        listaImprumuturi.Remove(imprumut);
     }
     else
     {
